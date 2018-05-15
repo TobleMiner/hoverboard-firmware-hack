@@ -14,8 +14,8 @@
 
 // ################################################################################
 
-#define DEBUG_SERIAL_USART2
-//#define DEBUG_SERIAL_USART3
+//#define DEBUG_SERIAL_USART2
+#define DEBUG_SERIAL_USART3
 #define DEBUG_BAUD       115200     // UART baud rate
 //#define DEBUG_SERIAL_SERVOTERM
 #define DEBUG_SERIAL_ASCII
@@ -26,14 +26,14 @@
 // ################################################################################
 
 // ###### CONTROL VIA RC REMOTE ######
-//#define CONTROL_PPM                // use PPM CONTROL_PPM
-//#define PPM_NUM_CHANNELS 6         // number of PPM channels to receive
+#define CONTROL_PPM                // use PPM CONTROL_PPM
+#define PPM_NUM_CHANNELS 8         // number of PPM channels to receive
 
 // ###### CONTROL VIA TWO POTENTIOMETERS ######
 // #define CONTROL_ADC
 
 // ###### CONTROL VIA NINTENDO NUNCHUCK ######
-#define CONTROL_NUNCHUCK
+//#define CONTROL_NUNCHUCK
 
 // ################################################################################
 
