@@ -21,8 +21,8 @@ DMA_HandleTypeDef hdma_i2c2_tx;
 uint16_t ppm_values[PPM_NUM_CHANNELS + 1] = {0};
 uint16_t *ppm_values_buffer[PPM_NUM_CHANNELS+1] = {0};
 
-uint16_t *ppm_captured_value = ppm_values;;
-uint16_t *ppm_captured_value_buffer = ppm_values_buffer;
+volatile uint16_t *ppm_captured_value = ppm_values;
+volatile uint16_t *ppm_captured_value_buffer = ppm_values_buffer;
 
 bool ppm_valid = true;
 
