@@ -41,6 +41,8 @@ void PPM_ISR_Callback() {
       volatile uint16_t *buffer_tmp = ppm_captured_value;
       ppm_captured_value = ppm_captured_value_buffer;
       ppm_captured_value_buffer = buffer_tmp;
+      setScopeChannel(0, (int)ppm_captured_value[0]);
+      setScopeChannel(1, (int)ppm_captured_value[1]);
     } else if(ppm_count < PPM_NUM_CHANNELS) {
       consoleLog("PPM invalid, too few pulses\n");
     }
