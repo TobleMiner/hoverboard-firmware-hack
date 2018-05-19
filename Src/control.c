@@ -50,8 +50,8 @@ void PPM_ISR_Callback() {
 // SysTick executes once each ms
 void PPM_SysTick_Callback() {
   ppm_timeout++;
-  // Stop after 21 ms without PPM signal
-  if(ppm_timeout > 50) {
+  // Stop after 500 ms without PPM signal
+  if(ppm_timeout > 500) {
     int i;
     for(i = 0; i < PPM_NUM_CHANNELS; i++) {
       ppm_captured_value[i] = 500;
