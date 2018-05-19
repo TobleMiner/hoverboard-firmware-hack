@@ -4,6 +4,7 @@
 #include "setup.h"
 #include "config.h"
 #include <stdbool.h>
+#include <string.h>
 
 TIM_HandleTypeDef TimHandle;
 volatile uint8_t ppm_count = 0;
@@ -18,11 +19,8 @@ DMA_HandleTypeDef hdma_i2c2_rx;
 DMA_HandleTypeDef hdma_i2c2_tx;
 
 #ifdef CONTROL_PPM
-uint16_t ppm_values[PPM_NUM_CHANNELS + 1] = {500, 500};
-uint16_t ppm_values_buffer[PPM_NUM_CHANNELS+1] = {500, 500};
-
-volatile uint16_t *ppm_captured_value = ppm_values;
-volatile uint16_t *ppm_captured_value_buffer = ppm_values_buffer;
+uint16_t ppm_captured_value[PPM_NUM_CHANNELS + 1] = {500, 500};
+uint16_t ppm_captured_value_buffer[PPM_NUM_CHANNELS+1] = {500, 500};
 
 bool ppm_valid = true;
 
@@ -37,9 +35,7 @@ void PPM_ISR_Callback() {
   if (rc_delay > 10000) {
     if (ppm_valid && ppm_count == PPM_NUM_CHANNELS) {
       // PPM signal is valid, swap buffers
-      volatile uint16_t *buffer_tmp = ppm_captured_value;
-      ppm_captured_value = ppm_captured_value_buffer;
-      ppm_captured_value_buffer = buffer_tmp;
+      memcpy(ppm_captured_value, ppm_captured_value_buffer, sizeof(ppm_captured_value));
       setScopeChannel(0, (int)ppm_captured_value[0]);
       setScopeChannel(1, (int)ppm_captured_value[1]);
     } else if(ppm_count < PPM_NUM_CHANNELS) {
