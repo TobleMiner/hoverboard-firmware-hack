@@ -42,7 +42,7 @@ void PPM_ISR_Callback() {
       ppm_captured_value = ppm_captured_value_buffer;
       ppm_captured_value_buffer = buffer_tmp;
     } else if(ppm_count < PPM_NUM_CHANNELS) {
-      consoleLog("PPM invalid, too few pulses: %d\n", ppm_count);
+      consoleLog("PPM invalid, too few pulses\n");
     }
     ppm_valid = true;
   }
@@ -51,7 +51,7 @@ void PPM_ISR_Callback() {
     ppm_captured_value_buffer[ppm_count] = CLAMP(rc_delay, 1000, 2000) - 1000;
     ppm_count++;
   } else {
-    consoleLog("PPM invalid, too many pulses: %d, timing out of range: %d\n", (int)(ppm_count >= PPM_NUM_CHANNELS), (int)(!IN_RANGE(rc_delay, 900, 2100)));
+    consoleLog("PPM invalid, too many or invalid pulses\n");
     ppm_valid = false;
   }
 }
