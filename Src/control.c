@@ -18,8 +18,8 @@ DMA_HandleTypeDef hdma_i2c2_rx;
 DMA_HandleTypeDef hdma_i2c2_tx;
 
 #ifdef CONTROL_PPM
-uint16_t ppm_values[PPM_NUM_CHANNELS + 1] = {0};
-uint16_t ppm_values_buffer[PPM_NUM_CHANNELS+1] = {0};
+uint16_t ppm_values[PPM_NUM_CHANNELS + 1] = {500, 500};
+uint16_t ppm_values_buffer[PPM_NUM_CHANNELS+1] = {500, 500};
 
 volatile uint16_t *ppm_captured_value = ppm_values;
 volatile uint16_t *ppm_captured_value_buffer = ppm_values_buffer;
