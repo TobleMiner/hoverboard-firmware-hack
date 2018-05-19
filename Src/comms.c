@@ -17,6 +17,7 @@ UART_HandleTypeDef huart2;
 
 
 volatile uint8_t uart_buf[100];
+volatile uint8_t console_buf[200];
 volatile int16_t ch_buf[8];
 //volatile char char_buf[300];
 
@@ -60,5 +61,14 @@ void consoleScope() {
 
 void consoleLog(char *message)
 {
-    HAL_UART_Transmit_DMA(&huart2, (uint8_t *)message, strlen(message));
+    memset(console_buf, 0, sizeof(console_buf));
+    strncpy(console_buf, message, sizeof(console_buf));
+    if(UART_DMA_CHANNEL->CNDTR == 0) {
+      UART_DMA_CHANNEL->CCR &= ~DMA_CCR_EN;
+      UART_DMA_CHANNEL->CNDTR = strlen(console_buf);
+      UART_DMA_CHANNEL->CMAR  = (uint32_t)console_buf;
+      UART_DMA_CHANNEL->CCR |= DMA_CCR_EN;
+    }
+
+//    HAL_UART_Transmit_DMA(&huart2, (uint8_t *)message, strlen(message));
 }
