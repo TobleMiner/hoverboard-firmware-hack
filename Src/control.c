@@ -6,7 +6,7 @@
 #include <stdbool.h>
 
 TIM_HandleTypeDef TimHandle;
-uint8_t ppm_count = 0;
+volatile uint8_t ppm_count = 0;
 uint32_t timeout = 100;
 uint8_t nunchuck_data[6] = {0};
 uint32_t ppm_timeout = 0;
@@ -34,8 +34,7 @@ void PPM_ISR_Callback() {
   TIM2->CNT = 0;
 
   ppm_timeout = 0;
-  if (rc_delay > 3000) {
-    ppm_count = 0;
+  if (rc_delay > 10000) {
     if (ppm_valid && ppm_count == PPM_NUM_CHANNELS) {
       // PPM signal is valid, swap buffers
       volatile uint16_t *buffer_tmp = ppm_captured_value;
@@ -44,9 +43,11 @@ void PPM_ISR_Callback() {
       setScopeChannel(0, (int)ppm_captured_value[0]);
       setScopeChannel(1, (int)ppm_captured_value[1]);
     } else if(ppm_count < PPM_NUM_CHANNELS) {
+    	//setScopeChannel(7, (int)ppm_count);
       consoleLog("PPM invalid, too few pulses\n");
     }
     ppm_valid = true;
+    ppm_count = 0;
   }
   else if (ppm_count < PPM_NUM_CHANNELS && IN_RANGE(rc_delay, 900, 2100)){
     timeout = 0;
@@ -54,8 +55,11 @@ void PPM_ISR_Callback() {
     ppm_count++;
   } else {
     consoleLog("PPM invalid, too many or invalid pulses\n");
+    //setScopeChannel(6, (int)ppm_count);
     ppm_valid = false;
   }
+  
+  // setScopeChannel(5, (int)rc_delay);
 }
 
 // SysTick executes once each ms
