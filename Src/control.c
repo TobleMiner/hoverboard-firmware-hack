@@ -19,7 +19,7 @@ DMA_HandleTypeDef hdma_i2c2_tx;
 
 #ifdef CONTROL_PPM
 uint16_t ppm_values[PPM_NUM_CHANNELS + 1] = {0};
-uint16_t *ppm_values_buffer[PPM_NUM_CHANNELS+1] = {0};
+uint16_t ppm_values_buffer[PPM_NUM_CHANNELS+1] = {0};
 
 volatile uint16_t *ppm_captured_value = ppm_values;
 volatile uint16_t *ppm_captured_value_buffer = ppm_values_buffer;
@@ -36,19 +36,22 @@ void PPM_ISR_Callback() {
   ppm_timeout = 0;
   if (rc_delay > 3000) {
     ppm_count = 0;
-    if (ppm_valid) {
+    if (ppm_valid && ppm_count == PPM_NUM_CHANNELS) {
       // PPM signal is valid, swap buffers
-      uint16_t *buffer_tmp = ppm_captured_value;
+      volatile uint16_t *buffer_tmp = ppm_captured_value;
       ppm_captured_value = ppm_captured_value_buffer;
       ppm_captured_value_buffer = buffer_tmp;
+    } else if(ppm_count < PPM_NUM_CHANNELS) {
+      consoleLog("PPM invalid, too few pulses: %d\n", ppm_count);
     }
     ppm_valid = true;
   }
   else if (ppm_count < PPM_NUM_CHANNELS && IN_RANGE(rc_delay, 900, 2100)){
     timeout = 0;
-    ppm_count++;
     ppm_captured_value_buffer[ppm_count] = CLAMP(rc_delay, 1000, 2000) - 1000;
+    ppm_count++;
   } else {
+    consoleLog("PPM invalid, too many pulses: %d, timing out of range: %d\n", (int)(ppm_count >= PPM_NUM_CHANNELS), (int)(!IN_RANGE(rc_delay, 900, 2100)));
     ppm_valid = false;
   }
 }
