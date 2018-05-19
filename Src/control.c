@@ -24,50 +24,38 @@ uint16_t ppm_captured_value_buffer[PPM_NUM_CHANNELS+1] = {500, 500};
 
 bool ppm_valid = true;
 
-#define IN_RANGE(x, low, up) (((x) >= low) && ((x) <= up))
+#define IN_RANGE(x, low, up) (((x) >= (low)) && ((x) <= (up)))
 
 void PPM_ISR_Callback() {
   // Dummy loop with 16 bit count wrap around
   uint16_t rc_delay = TIM2->CNT;
   TIM2->CNT = 0;
 
-  ppm_timeout = 0;
-  if (rc_delay > 10000) {
+  if (rc_delay > 3000) {
     if (ppm_valid && ppm_count == PPM_NUM_CHANNELS) {
-      // PPM signal is valid, swap buffers
+      ppm_timeout = 0;
       memcpy(ppm_captured_value, ppm_captured_value_buffer, sizeof(ppm_captured_value));
-      setScopeChannel(0, (int)ppm_captured_value[0]);
-      setScopeChannel(1, (int)ppm_captured_value[1]);
-    } else if(ppm_count < PPM_NUM_CHANNELS) {
-    	//setScopeChannel(7, (int)ppm_count);
-      consoleLog("PPM invalid, too few pulses\n");
     }
     ppm_valid = true;
     ppm_count = 0;
   }
   else if (ppm_count < PPM_NUM_CHANNELS && IN_RANGE(rc_delay, 900, 2100)){
     timeout = 0;
-    ppm_captured_value_buffer[ppm_count] = CLAMP(rc_delay, 1000, 2000) - 1000;
-    ppm_count++;
+    ppm_captured_value_buffer[ppm_count++] = CLAMP(rc_delay, 1000, 2000) - 1000;
   } else {
-    consoleLog("PPM invalid, too many or invalid pulses\n");
-    //setScopeChannel(6, (int)ppm_count);
     ppm_valid = false;
-  }
-  
-  // setScopeChannel(5, (int)rc_delay);
+  }  
 }
 
 // SysTick executes once each ms
 void PPM_SysTick_Callback() {
   ppm_timeout++;
   // Stop after 21 ms without PPM signal
-  if(ppm_timeout > 21) {
+  if(ppm_timeout > 50) {
     int i;
     for(i = 0; i < PPM_NUM_CHANNELS; i++) {
       ppm_captured_value[i] = 500;
     }
-    consoleLog("PPM timeout\n");
     ppm_timeout = 0;
   }
 }
